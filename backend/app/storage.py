@@ -8,6 +8,7 @@ from langgraph.checkpoint.base import empty_checkpoint
 from langgraph.pregel import _prepare_next_tasks
 
 from app.agent import AgentType, get_agent_executor
+from app.checkpoint import checkpoint_key
 from app.redis import get_redis_client
 from app.schema import Assistant, AssistantWithoutUserId, Thread, ThreadWithoutUserId
 from app.stream import map_chunk_to_msg
@@ -183,6 +184,16 @@ def put_thread(user_id: str, thread_id: str, *, assistant_id: str, name: str) ->
         pipe.hset(thread_key(user_id, thread_id), mapping=_dump(saved))
         pipe.execute()
     return saved
+
+
+def delete_thread(user_id: str, thread_id: str) -> None:
+    """Delete a thread."""
+    client = get_redis_client()
+    with client.pipeline() as pipe:
+        pipe.srem(threads_list_key(user_id), orjson.dumps(thread_id))
+        pipe.delete(thread_key(user_id, thread_id))
+        pipe.delete(checkpoint_key(user_id, thread_id))
+        pipe.execute()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from typing import Annotated, List, Sequence
 from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Response, status
 from langchain.schema.messages import AnyMessage
 from pydantic import BaseModel, Field
 
@@ -91,3 +91,13 @@ def upsert_thread(
         assistant_id=thread_put_request.assistant_id,
         name=thread_put_request.name,
     )
+
+
+@router.delete("/{tid}/")
+def delete_thread(
+    opengpts_user_id: OpengptsUserId,
+    tid: ThreadID,
+):
+    """Delete a thread."""
+    storage.delete_thread(opengpts_user_id, tid)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
