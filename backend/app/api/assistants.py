@@ -1,7 +1,7 @@
 from typing import Annotated, List, Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Path, Query, Response, status
 from pydantic import BaseModel, Field
 
 import app.storage as storage
@@ -82,3 +82,13 @@ def upsert_assistant(
         config=payload.config,
         public=payload.public,
     )
+
+
+@router.delete("/{aid}/")
+def delete_assistant(
+    opengpts_user_id: OpengptsUserId,
+    aid: AssistantID,
+):
+    """Delete an assistant."""
+    storage.delete_assistant(opengpts_user_id, aid)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -7,6 +7,7 @@ The details here might change in the future.
 For the time being, upload and ingestion are coupled
 """
 from __future__ import annotations
+from functools import lru_cache
 
 import os
 from typing import Any, BinaryIO, List, Optional
@@ -57,22 +58,19 @@ class IngestRunnable(RunnableSerializable[BinaryIO, List[str]]):
 
     text_splitter: TextSplitter
     """Text splitter to use for splitting the text into chunks."""
-    vectorstore: VectorStore
-    """Vectorstore to ingest into."""
     assistant_id: Optional[str]
     """Ingested documents will be associated with this assistant id.
-    
-    The assistant ID is used as the namespace, and is filtered on at query time.
     """
 
     class Config:
         arbitrary_types_allowed = True
 
     @property
-    def namespace(self) -> str:
+    def vectorstore(self) -> VectorStore:
+        """Vectorstore to ingest into."""
         if self.assistant_id is None:
             raise ValueError("assistant_id must be provided")
-        return self.assistant_id
+        return get_vectorstore(self.assistant_id)
 
     def invoke(
         self, input: BinaryIO, config: Optional[RunnableConfig] = None
@@ -97,26 +95,22 @@ class IngestRunnable(RunnableSerializable[BinaryIO, List[str]]):
                     MIMETYPE_BASED_PARSER,
                     self.text_splitter,
                     self.vectorstore,
-                    self.namespace,
                 )
             )
         return ids
 
 
-index_schema = {
-    "tag": [{"name": "namespace"}],
-}
-vstore = Redis(
-    redis_url=os.environ["REDIS_URL"],
-    index_name="opengpts",
-    embedding=OpenAIEmbeddings(),
-    index_schema=index_schema,
-)
+@lru_cache(maxsize=1)
+def get_vectorstore(assistant_id: str) -> VectorStore:
+    return Redis(
+        redis_url=os.environ["REDIS_URL"],
+        index_name=assistant_id,
+        embedding=OpenAIEmbeddings(),
+    )
 
 
 ingest_runnable = IngestRunnable(
     text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200),
-    vectorstore=vstore,
 ).configurable_fields(
     assistant_id=ConfigurableField(
         id="assistant_id",

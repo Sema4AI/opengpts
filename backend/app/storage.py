@@ -6,6 +6,7 @@ from langchain.schema.messages import AnyMessage
 from langgraph.channels.base import ChannelsManager
 from langgraph.checkpoint.base import empty_checkpoint
 from langgraph.pregel import _prepare_next_tasks
+from langchain_community.vectorstores.redis import Redis
 
 from app.agent import AgentType, get_agent_executor
 from app.checkpoint import checkpoint_key
@@ -118,6 +119,26 @@ def put_assistant(
             pipe.hset(assistant_key(public_user_id, assistant_id), mapping=_dump(saved))
         pipe.execute()
     return saved
+
+
+def delete_assistant(user_id: str, assistant_id: str) -> None:
+    """Delete an assistant."""
+    client = get_redis_client()
+    with client.pipeline() as pipe:
+        pipe.srem(assistants_list_key(user_id), orjson.dumps(assistant_id))
+        pipe.delete(assistant_key(user_id, assistant_id))
+        pipe.srem(assistants_list_key(public_user_id), orjson.dumps(assistant_id))
+        pipe.delete(assistant_key(public_user_id, assistant_id))
+        pipe.execute()
+    Redis.drop_index(assistant_id, True)
+
+    # TODO
+    # Nuno: "So ideally when deleting an assistant we'd instead keep the threads
+    # and the next time they're used the user would be prompted to select an
+    # assistant to continue the convo."
+    #
+    # So, set assistant_id = None for threads (private and public) that are
+    # using this assistant?
 
 
 def list_threads(user_id: str) -> List[ThreadWithoutUserId]:

@@ -11,13 +11,7 @@ from typing import List
 from langchain.text_splitter import TextSplitter
 from langchain_community.document_loaders import Blob
 from langchain_community.document_loaders.base import BaseBlobParser
-from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
-
-
-def _update_document_metadata(document: Document, namespace: str) -> None:
-    """Mutation in place that adds a namespace to the document metadata."""
-    document.metadata["namespace"] = namespace
 
 
 # PUBLIC API
@@ -28,7 +22,6 @@ def ingest_blob(
     parser: BaseBlobParser,
     text_splitter: TextSplitter,
     vectorstore: VectorStore,
-    namespace: str,
     *,
     batch_size: int = 100,
 ) -> List[str]:
@@ -37,8 +30,6 @@ def ingest_blob(
     ids = []
     for document in parser.lazy_parse(blob):
         docs = text_splitter.split_documents([document])
-        for doc in docs:
-            _update_document_metadata(doc, namespace)
         docs_to_index.extend(docs)
 
         if len(docs_to_index) >= batch_size:
