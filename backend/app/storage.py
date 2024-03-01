@@ -129,16 +129,19 @@ def delete_assistant(user_id: str, assistant_id: str) -> None:
         pipe.delete(assistant_key(user_id, assistant_id))
         pipe.srem(assistants_list_key(public_user_id), orjson.dumps(assistant_id))
         pipe.delete(assistant_key(public_user_id, assistant_id))
-        pipe.execute()
-    Redis.drop_index(assistant_id, True)
 
-    # TODO
-    # Nuno: "So ideally when deleting an assistant we'd instead keep the threads
-    # and the next time they're used the user would be prompted to select an
-    # assistant to continue the convo."
-    #
-    # So, set assistant_id = None for threads (private and public) that are
-    # using this assistant?
+        for key in client.scan_iter("opengpts:*:thread:*"):
+            if ":checkpoint" in key.decode("utf-8"):
+                continue
+            raw_aid = client.hmget(key, "assistant_id")[0]
+            if raw_aid == b"":
+                continue
+            if orjson.loads(raw_aid) == assistant_id:
+                pipe.hset(key, "assistant_id", "")
+
+        pipe.execute()
+
+    Redis.drop_index(assistant_id, True)
 
 
 def list_threads(user_id: str) -> List[ThreadWithoutUserId]:
