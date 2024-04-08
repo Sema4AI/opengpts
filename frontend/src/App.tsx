@@ -15,8 +15,10 @@ import { Config } from "./components/Config";
 import { MessageWithFiles } from "./utils/formTypes.ts";
 import { useNavigate } from "react-router-dom";
 import { useThreadAndAssistant } from "./hooks/useThreadAndAssistant.ts";
+import { useAuth } from "react-oidc-context";
 
 function App(props: { edit?: boolean }) {
+  const auth = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { chats, createChat } = useChatList();
@@ -95,6 +97,18 @@ function App(props: { edit?: boolean }) {
     },
     [navigate],
   );
+
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth.error) {
+    return <div>Oops... {auth.error.message}</div>;
+  }
+
+  if (!auth.isAuthenticated) {
+    return <button onClick={() => void auth.signinRedirect()}>Log in</button>;
+  }
 
   return (
     <Layout

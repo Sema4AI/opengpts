@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { StrictMode } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { NotFound } from "./components/NotFound.tsx";
+import { AuthProvider } from "react-oidc-context";
 
 function getCookie(name: string) {
   const cookie = document.cookie
@@ -28,23 +29,31 @@ document.addEventListener("DOMContentLoaded", () => {
   document.cookie = `opengpts_user_id=${userId}; path=/; expires=${expires}; SameSite=Lax;`;
 });
 
+const oidcConfig = {
+  authority: "https://dev-98644545.okta.com",
+  client_id: "0oagapim8mAI4fpzu5d7",
+  redirect_uri: "http://localhost:5173/login/callback",
+};
+
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/thread/:chatId" element={<App />} />
-          <Route
-            path="/assistant/:assistantId/edit"
-            element={<App edit={true} />}
-          />
-          <Route path="/assistant/:assistantId" element={<App />} />
-          <Route path="/" element={<App />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <AuthProvider {...oidcConfig}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/thread/:chatId" element={<App />} />
+            <Route
+              path="/assistant/:assistantId/edit"
+              element={<App edit={true} />}
+            />
+            <Route path="/assistant/:assistantId" element={<App />} />
+            <Route path="/" element={<App />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </AuthProvider>
   </StrictMode>,
 );
