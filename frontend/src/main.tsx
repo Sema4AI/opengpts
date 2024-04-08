@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const oidcConfig = {
   authority: "https://dev-98644545.okta.com",
   client_id: "0oagapim8mAI4fpzu5d7",
-  redirect_uri: "http://localhost:5173/login/callback",
+  redirect_uri: `${window.location.origin}/login/callback`,
 };
 
 const queryClient = new QueryClient();
