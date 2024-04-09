@@ -43,6 +43,9 @@ function App(props: { edit?: boolean }) {
         await fetch(`/ingest`, {
           method: "POST",
           body: formData,
+            headers: {
+              Authorization: `Bearer ${auth.user?.access_token}`
+            }
         });
       }
       await startStream(
@@ -60,7 +63,7 @@ function App(props: { edit?: boolean }) {
         thread_id,
       );
     },
-    [startStream],
+    [auth.user?.access_token, startStream],
   );
 
   const startChat = useCallback(
