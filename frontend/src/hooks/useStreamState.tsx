@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { Message } from "./useChatList";
-import {useAuth} from "react-oidc-context";
+import { useAuth } from "react-oidc-context";
 
 export interface StreamState {
   status: "inflight" | "error" | "done";
@@ -29,7 +29,10 @@ export function useStreamState(): StreamStateProps {
       await fetchEventSource("/runs/stream", {
         signal: controller.signal,
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${auth.user?.access_token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.user?.access_token}`,
+        },
         body: JSON.stringify({ input, thread_id }),
         openWhenHidden: true,
         onmessage(msg) {
@@ -74,7 +77,7 @@ export function useStreamState(): StreamStateProps {
         },
       });
     },
-    [],
+    [auth?.user?.access_token],
   );
 
   const stopStream = useCallback(

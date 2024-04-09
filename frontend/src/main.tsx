@@ -1,12 +1,9 @@
 import ReactDOM from "react-dom/client";
 import { v4 as uuidv4 } from "uuid";
-import App from "./App.tsx";
 import "./index.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { StrictMode } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { NotFound } from "./components/NotFound.tsx";
 import { AuthProvider } from "react-oidc-context";
+import { AppRouter } from "./AppRouter.tsx";
 
 function getCookie(name: string) {
   const cookie = document.cookie
@@ -29,34 +26,22 @@ document.addEventListener("DOMContentLoaded", () => {
   document.cookie = `opengpts_user_id=${userId}; path=/; expires=${expires}; SameSite=Lax;`;
 });
 
-console.log('OIDC Authority:', import.meta.env.VITE_OIDC_AUTHORITY);
-console.log('OIDC Client ID:', import.meta.env.VITE_OIDC_CLIENT_ID);
-
 const oidcConfig = {
   authority: import.meta.env.VITE_OIDC_AUTHORITY,
   client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
   redirect_uri: `${window.location.origin}/login/callback`,
 };
 
-const queryClient = new QueryClient();
+const isAuthEnabled = import.meta.env.VITE_AUTH_TYPE === "jwt_oidc";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider {...oidcConfig}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/thread/:chatId" element={<App />} />
-            <Route
-              path="/assistant/:assistantId/edit"
-              element={<App edit={true} />}
-            />
-            <Route path="/assistant/:assistantId" element={<App />} />
-            <Route path="/" element={<App />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </AuthProvider>
+    {isAuthEnabled ? (
+      <AuthProvider {...oidcConfig}>
+        <AppRouter />
+      </AuthProvider>
+    ) : (
+      <AppRouter />
+    )}
   </StrictMode>,
 );

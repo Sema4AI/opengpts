@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer } from "react";
 import orderBy from "lodash/orderBy";
-import {useAuth} from "react-oidc-context";
-import {User} from "oidc-client-ts";
+import { useAuth } from "react-oidc-context";
+import { User } from "oidc-client-ts";
 
 export interface Message {
   id: string;
@@ -62,8 +62,6 @@ function chatsReducer(
 export function useChatList(): ChatListProps {
   const auth = useAuth();
 
-  console.log(auth.user?.access_token);
-
   const [chats, setChats] = useReducer(chatsReducer, null);
 
   useEffect(() => {
@@ -71,15 +69,14 @@ export function useChatList(): ChatListProps {
       const chats = await fetch("/threads/", {
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${user.access_token}`
+          Authorization: `Bearer ${user.access_token}`,
         },
       }).then((r) => r.json());
       setChats(chats);
     }
 
-    if (auth.user)
-      fetchChats(auth.user);
-  }, [auth.user]);
+    if (auth?.user) fetchChats(auth.user);
+  }, [auth?.user]);
 
   const createChat = useCallback(async (name: string, assistant_id: string) => {
     const response = await fetch(`/threads`, {

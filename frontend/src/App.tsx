@@ -43,9 +43,9 @@ function App(props: { edit?: boolean }) {
         await fetch(`/ingest`, {
           method: "POST",
           body: formData,
-            headers: {
-              Authorization: `Bearer ${auth.user?.access_token}`
-            }
+          headers: {
+            Authorization: `Bearer ${auth.user?.access_token}`,
+          },
         });
       }
       await startStream(
@@ -63,7 +63,7 @@ function App(props: { edit?: boolean }) {
         thread_id,
       );
     },
-    [auth.user?.access_token, startStream],
+    [auth?.user?.access_token, startStream],
   );
 
   const startChat = useCallback(
@@ -100,18 +100,6 @@ function App(props: { edit?: boolean }) {
     },
     [navigate],
   );
-
-  if (auth.isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (auth.error) {
-    return <div>Oops... {auth.error.message}</div>;
-  }
-
-  if (!auth.isAuthenticated) {
-    return <button onClick={() => void auth.signinRedirect()}>Log in</button>;
-  }
 
   return (
     <Layout
