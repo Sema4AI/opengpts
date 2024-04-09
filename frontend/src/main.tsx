@@ -29,9 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.cookie = `opengpts_user_id=${userId}; path=/; expires=${expires}; SameSite=Lax;`;
 });
 
+console.log('OIDC Authority:', import.meta.env.VITE_OIDC_AUTHORITY);
+console.log('OIDC Client ID:', import.meta.env.VITE_OIDC_CLIENT_ID);
+
 const oidcConfig = {
-  authority: "https://dev-98644545.okta.com",
-  client_id: "0oagapim8mAI4fpzu5d7",
+  authority: import.meta.env.VITE_OIDC_AUTHORITY,
+  client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
   redirect_uri: `${window.location.origin}/login/callback`,
 };
 
