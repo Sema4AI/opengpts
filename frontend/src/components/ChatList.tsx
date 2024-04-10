@@ -1,4 +1,7 @@
-import { PlusIcon, ScaleIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 
 import { ChatListProps } from "../hooks/useChatList";
 import { cn } from "../utils/cn";
@@ -19,7 +22,7 @@ function UserInfo(props: { user: User }) {
           onClick={() => signoutRedirect()}
           className="flex mt-4 items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
         >
-          <ScaleIcon className="h-4 w-4 mr-2" />
+          <ArrowRightOnRectangleIcon className="h-4 w-4 mr-2" />
           Logout
         </button>
       </div>
