@@ -26,22 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.cookie = `opengpts_user_id=${userId}; path=/; expires=${expires}; SameSite=Lax;`;
 });
 
-const oidcConfig = {
+const isAuthEnabled = import.meta.env.VITE_AUTH_TYPE === "jwt_oidc";
+
+const oidcConfig = isAuthEnabled ? {
   authority: import.meta.env.VITE_OIDC_AUTHORITY,
   client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
   redirect_uri: `${window.location.origin}/login/callback`,
-};
+} : {};
 
-const isAuthEnabled = import.meta.env.VITE_AUTH_TYPE === "jwt_oidc";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {isAuthEnabled ? (
-      <AuthProvider {...oidcConfig}>
-        <AppRouter />
-      </AuthProvider>
-    ) : (
+    <AuthProvider {...oidcConfig}>
       <AppRouter />
-    )}
+    </AuthProvider>
   </StrictMode>,
 );

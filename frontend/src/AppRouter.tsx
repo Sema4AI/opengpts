@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import App from "./App.tsx";
 import { NotFound } from "./components/NotFound.tsx";
-import {useAuth} from "react-oidc-context";
-import {FC, ReactNode} from "react";
+import { useAuth } from "react-oidc-context";
+import { FC, ReactNode } from "react";
 
 const queryClient = new QueryClient();
 
@@ -37,13 +37,38 @@ export function AppRouter() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/thread/:chatId" element={<AuthWrapper><App /></AuthWrapper>} />
+          <Route
+            path="/thread/:chatId"
+            element={
+              <AuthWrapper>
+                <App />
+              </AuthWrapper>
+            }
+          />
           <Route
             path="/assistant/:assistantId/edit"
-            element={<AuthWrapper><App edit={true} /></AuthWrapper>}
+            element={
+              <AuthWrapper>
+                <App edit={true} />
+              </AuthWrapper>
+            }
           />
-          <Route path="/assistant/:assistantId" element={<AuthWrapper><App /></AuthWrapper>} />
-          <Route path="/" element={<AuthWrapper><App /></AuthWrapper>} />
+          <Route
+            path="/assistant/:assistantId"
+            element={
+              <AuthWrapper>
+                <App />
+              </AuthWrapper>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <AuthWrapper>
+                <App />
+              </AuthWrapper>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

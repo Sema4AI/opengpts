@@ -15,10 +15,10 @@ import { Config } from "./components/Config";
 import { MessageWithFiles } from "./utils/formTypes.ts";
 import { useNavigate } from "react-router-dom";
 import { useThreadAndAssistant } from "./hooks/useThreadAndAssistant.ts";
-import { useAuth } from "react-oidc-context";
+import {useUser} from "./hooks/useUser.ts";
 
 function App(props: { edit?: boolean }) {
-  const auth = useAuth();
+  const user = useUser();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { chats, createChat } = useChatList();
@@ -44,7 +44,7 @@ function App(props: { edit?: boolean }) {
           method: "POST",
           body: formData,
           headers: {
-            Authorization: `Bearer ${auth.user?.access_token}`,
+            Authorization: `Bearer ${user?.access_token}`,
           },
         });
       }
@@ -63,7 +63,7 @@ function App(props: { edit?: boolean }) {
         thread_id,
       );
     },
-    [auth?.user?.access_token, startStream],
+    [user?.access_token, startStream],
   );
 
   const startChat = useCallback(
