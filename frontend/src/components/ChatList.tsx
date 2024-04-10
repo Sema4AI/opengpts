@@ -19,7 +19,7 @@ function UserInfo(props: { user: User }) {
           <span className="text-sm font-semibold">{`${props.user.profile.email || props.user.profile.sub}`}</span>
         </div>
         <button
-          onClick={() => signoutRedirect()}
+          onClick={() => signoutRedirect({post_logout_redirect_uri: window.location.origin})}
           className="flex mt-4 items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
         >
           <ArrowRightOnRectangleIcon className="h-4 w-4 mr-2" />

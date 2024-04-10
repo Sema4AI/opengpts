@@ -15,6 +15,9 @@ const queryClient = new QueryClient();
 
 const isAuthEnabled = import.meta.env.VITE_AUTH_TYPE === "jwt_oidc";
 
+// Tailwind CSS classes for centering and styling
+const centerClasses = "flex flex-col justify-center items-center h-screen";
+
 const AuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
@@ -24,19 +27,33 @@ const AuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
   }
 
   if (auth.isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className={centerClasses}>
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   if (auth.error) {
-    return <div>Oops... {auth.error.message}</div>;
+    return (
+      <div className={centerClasses}>
+        <div>Oops... {auth.error.message}</div>
+      </div>
+    );
   }
 
   if (!auth.isAuthenticated) {
-    localStorage.setItem(
-      "post-login-redirect-url",
-      location.pathname + location.search,
+    localStorage.setItem("post-login-redirect-url", location.pathname + location.search);
+    return (
+      <div className={centerClasses}>
+        <button
+          onClick={() => void auth.signinRedirect()}
+          className="mt-4 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          Log in
+        </button>
+      </div>
     );
-    return <button onClick={() => void auth.signinRedirect()}>Log in</button>;
   }
 
   return <>{children}</>;
@@ -56,7 +73,7 @@ const AuthCallbackHandler = () => {
     }
   }, [auth, navigate]);
 
-  return <div>Handling authentication...</div>;
+  return <div className={centerClasses}><div>Handling authentication...</div></div>;
 };
 
 export function AppRouter() {
