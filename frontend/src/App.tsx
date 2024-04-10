@@ -15,7 +15,7 @@ import { Config } from "./components/Config";
 import { MessageWithFiles } from "./utils/formTypes.ts";
 import { useNavigate } from "react-router-dom";
 import { useThreadAndAssistant } from "./hooks/useThreadAndAssistant.ts";
-import {useUser} from "./hooks/useUser.ts";
+import { useUser } from "./hooks/useUser.ts";
 
 function App(props: { edit?: boolean }) {
   const user = useUser();

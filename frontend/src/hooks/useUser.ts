@@ -1,6 +1,6 @@
-import {AuthContext} from "react-oidc-context";
-import {User} from "oidc-client-ts";
-import {useContext} from "react";
+import { AuthContext } from "react-oidc-context";
+import { User } from "oidc-client-ts";
+import { useContext } from "react";
 
 const isAuthEnabled = import.meta.env.VITE_AUTH_TYPE === "jwt_oidc";
 

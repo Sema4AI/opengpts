@@ -28,12 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const isAuthEnabled = import.meta.env.VITE_AUTH_TYPE === "jwt_oidc";
 
-const oidcConfig = isAuthEnabled ? {
-  authority: import.meta.env.VITE_OIDC_AUTHORITY,
-  client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
-  redirect_uri: `${window.location.origin}/login/callback`,
-} : {};
-
+const oidcConfig = isAuthEnabled
+  ? {
+      authority: import.meta.env.VITE_OIDC_AUTHORITY,
+      client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
+      redirect_uri: `${window.location.origin}/login/callback`,
+    }
+  : {};
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
