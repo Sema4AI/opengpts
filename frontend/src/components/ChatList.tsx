@@ -3,12 +3,14 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { ChatListProps } from "../hooks/useChatList";
 import { cn } from "../utils/cn";
 import { useThreadAndAssistant } from "../hooks/useThreadAndAssistant.ts";
+import { useUser } from "../hooks/useUser.ts";
 
 export function ChatList(props: {
   chats: ChatListProps["chats"];
   enterChat: (id: string | null) => void;
   enterConfig: (id: string | null) => void;
 }) {
+  const user = useUser();
   const { currentChat, assistantConfig } = useThreadAndAssistant();
 
   return (
@@ -91,6 +93,8 @@ export function ChatList(props: {
           </li>
         )}
       </ul>
+
+      <div>{`HELLO ${user?.profile.email || user?.profile.sub}`}</div>
     </>
   );
 }
