@@ -43,7 +43,10 @@ const AuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
   }
 
   if (!auth.isAuthenticated) {
-    localStorage.setItem("post-login-redirect-url", location.pathname + location.search);
+    localStorage.setItem(
+      "post-login-redirect-url",
+      location.pathname + location.search,
+    );
     return (
       <div className={centerClasses}>
         <button
@@ -73,7 +76,11 @@ const AuthCallbackHandler = () => {
     }
   }, [auth, navigate]);
 
-  return <div className={centerClasses}><div>Handling authentication...</div></div>;
+  return (
+    <div className={centerClasses}>
+      <div>Handling authentication...</div>
+    </div>
+  );
 };
 
 export function AppRouter() {
