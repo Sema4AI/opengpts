@@ -1,4 +1,4 @@
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ScaleIcon } from "@heroicons/react/24/outline";
 
 import { ChatListProps } from "../hooks/useChatList";
 import { cn } from "../utils/cn";
@@ -12,6 +12,11 @@ export function ChatList(props: {
 }) {
   const user = useUser();
   const { currentChat, assistantConfig } = useThreadAndAssistant();
+
+  // Placeholder logout function
+  const handleLogout = () => {
+    console.log("Logout functionality to be implemented");
+  };
 
   return (
     <>
@@ -94,7 +99,22 @@ export function ChatList(props: {
         )}
       </ul>
 
-      <div>{`HELLO ${user?.profile.email || user?.profile.sub}`}</div>
+      {user && (
+        <div className="px-4 py-2">
+          <div className="flex flex-col justify-between items-center border-t pt-4 mt-4">
+            <div>
+              <span className="text-sm font-semibold">{`${user.profile.email || user.profile.sub}`}</span>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex mt-4 items-center px-3 py-1 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
+            >
+              <ScaleIcon className="h-4 w-4 mr-2" />
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
