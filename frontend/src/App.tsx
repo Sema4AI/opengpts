@@ -15,10 +15,10 @@ import { Config } from "./components/Config";
 import { MessageWithFiles } from "./utils/formTypes.ts";
 import { useNavigate } from "react-router-dom";
 import { useThreadAndAssistant } from "./hooks/useThreadAndAssistant.ts";
-import { useUser } from "./hooks/useUser.ts";
+import { useAuthFetch } from "./hooks/useAuthFetch.ts";
 
 function App(props: { edit?: boolean }) {
-  const user = useUser();
+  const authFetch = useAuthFetch();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { chats, createChat } = useChatList();
@@ -40,12 +40,9 @@ function App(props: { edit?: boolean }) {
           "config",
           JSON.stringify({ configurable: { thread_id } }),
         );
-        await fetch(`/ingest`, {
+        await authFetch(`/ingest`, {
           method: "POST",
           body: formData,
-          headers: {
-            Authorization: `Bearer ${user?.access_token}`,
-          },
         });
       }
       await startStream(
@@ -63,7 +60,7 @@ function App(props: { edit?: boolean }) {
         thread_id,
       );
     },
-    [user?.access_token, startStream],
+    [authFetch, startStream],
   );
 
   const startChat = useCallback(
