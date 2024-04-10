@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer } from "react";
 import orderBy from "lodash/orderBy";
+import { useAuthFetch } from "./useAuthFetch.ts";
 
 export interface Config {
   assistant_id: string;
@@ -42,11 +43,12 @@ function configsReducer(
 }
 
 export function useConfigList(): ConfigListProps {
+  const authFetch = useAuthFetch();
   const [configs, setConfigs] = useReducer(configsReducer, null);
 
   useEffect(() => {
     async function fetchConfigs() {
-      const myConfigs = await fetch("/assistants/", {
+      const myConfigs = await authFetch("/assistants/", {
         headers: {
           Accept: "application/json",
         },
@@ -57,7 +59,7 @@ export function useConfigList(): ConfigListProps {
     }
 
     fetchConfigs();
-  }, []);
+  }, [authFetch]);
 
   const saveConfig = useCallback(
     async (
@@ -67,7 +69,7 @@ export function useConfigList(): ConfigListProps {
       isPublic: boolean,
       assistantId?: string,
     ): Promise<string> => {
-      const confResponse = await fetch(
+      const confResponse = await authFetch(
         assistantId ? `/assistants/${assistantId}` : "/assistants",
         {
           method: assistantId ? "PUT" : "POST",
@@ -89,7 +91,7 @@ export function useConfigList(): ConfigListProps {
           "config",
           JSON.stringify({ configurable: { assistant_id } }),
         );
-        await fetch(`/ingest`, {
+        await authFetch(`/ingest`, {
           method: "POST",
           body: formData,
         });
@@ -97,7 +99,7 @@ export function useConfigList(): ConfigListProps {
       setConfigs({ ...savedConfig, mine: true });
       return savedConfig.assistant_id;
     },
-    [],
+    [authFetch],
   );
 
   return {

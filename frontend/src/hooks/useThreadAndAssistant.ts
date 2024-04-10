@@ -2,15 +2,17 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { getAssistant } from "../api/assistants";
 import { getThread } from "../api/threads";
+import { useAuthFetch } from "./useAuthFetch.ts";
 
 export function useThreadAndAssistant() {
+  const authFetch = useAuthFetch();
   // Extract route parameters
   const { chatId, assistantId } = useParams();
 
   // React Query to fetch chat details if chatId is present
   const { data: currentChat, isLoading: isLoadingChat } = useQuery(
     ["thread", chatId],
-    () => getThread(chatId as string),
+    () => getThread(chatId as string, authFetch),
     {
       enabled: !!chatId,
     },
@@ -22,7 +24,7 @@ export function useThreadAndAssistant() {
   // React Query to fetch assistant configuration based on the effectiveAssistantId
   const { data: assistantConfig, isLoading: isLoadingAssistant } = useQuery(
     ["assistant", effectiveAssistantId],
-    () => getAssistant(effectiveAssistantId as string),
+    () => getAssistant(effectiveAssistantId as string, authFetch),
     {
       enabled: !!effectiveAssistantId,
     },

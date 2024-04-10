@@ -5,17 +5,17 @@ export function useAuthFetch() {
   const user = useUser();
 
   const authFetch = useCallback(
-    async (input: RequestInfo, init: RequestInit = {}) => {
+    async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       let headers: Record<string, string> = {};
 
-      if (init.headers instanceof Headers) {
+      if (init?.headers instanceof Headers) {
         headers = Object.fromEntries(init.headers.entries());
-      } else if (Array.isArray(init.headers)) {
-        headers = init.headers.reduce(
+      } else if (Array.isArray(init?.headers)) {
+        headers = init!.headers.reduce(
           (acc, [key, value]) => ({ ...acc, [key]: value }),
           {},
         );
-      } else if (init.headers) {
+      } else if (init?.headers) {
         headers = { ...init.headers };
       }
 

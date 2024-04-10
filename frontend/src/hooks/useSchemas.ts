@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { simplifySchema } from "../utils/simplifySchema";
 import { getDefaults } from "../utils/defaults";
+import { useAuthFetch } from "./useAuthFetch.ts";
 
 export interface SchemaField {
   type: string;
@@ -29,6 +30,7 @@ export interface Schemas {
 }
 
 export function useSchemas() {
+  const authFetch = useAuthFetch();
   const [schemas, setSchemas] = useState<Schemas>({
     configSchema: null,
     configDefaults: null,
@@ -36,7 +38,7 @@ export function useSchemas() {
 
   useEffect(() => {
     async function save() {
-      const configSchema = await fetch("/runs/config_schema")
+      const configSchema = await authFetch("/runs/config_schema")
         .then((r) => r.json())
         .then(simplifySchema);
       setSchemas({
@@ -46,7 +48,7 @@ export function useSchemas() {
     }
 
     save();
-  }, []);
+  }, [authFetch]);
 
   return schemas;
 }
