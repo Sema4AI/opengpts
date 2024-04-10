@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useReducer } from "react";
 import orderBy from "lodash/orderBy";
-import { useAuth } from "react-oidc-context";
-import { User } from "oidc-client-ts";
+import { useAuthFetch } from "./useAuthFetch.ts";
 
 export interface Message {
   id: string;
@@ -60,37 +59,39 @@ function chatsReducer(
 }
 
 export function useChatList(): ChatListProps {
-  const auth = useAuth();
+  const authFetch = useAuthFetch();
 
   const [chats, setChats] = useReducer(chatsReducer, null);
 
   useEffect(() => {
-    async function fetchChats(user: User) {
-      const chats = await fetch("/threads/", {
+    async function fetchChats() {
+      const chats = await authFetch("/threads/", {
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${user.access_token}`,
         },
       }).then((r) => r.json());
       setChats(chats);
     }
 
-    if (auth?.user) fetchChats(auth.user);
-  }, [auth?.user]);
+    fetchChats();
+  }, [authFetch]);
 
-  const createChat = useCallback(async (name: string, assistant_id: string) => {
-    const response = await fetch(`/threads`, {
-      method: "POST",
-      body: JSON.stringify({ assistant_id, name }),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    const saved = await response.json();
-    setChats(saved);
-    return saved;
-  }, []);
+  const createChat = useCallback(
+    async (name: string, assistant_id: string) => {
+      const response = await authFetch(`/threads`, {
+        method: "POST",
+        body: JSON.stringify({ assistant_id, name }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      const saved = await response.json();
+      setChats(saved);
+      return saved;
+    },
+    [authFetch],
+  );
 
   return {
     chats,

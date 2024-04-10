@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Message } from "./useChatList";
 import { StreamState, mergeMessagesById } from "./useStreamState";
+import { useAuthFetch } from "./useAuthFetch.ts";
 
-async function getMessages(threadId: string) {
-  const { messages, resumeable } = await fetch(
+async function getMessages(
+  threadId: string,
+  authFetch: (input: RequestInfo, init?: RequestInit) => Promise<Response>,
+) {
+  const { messages, resumeable } = await authFetch(
     `/threads/${threadId}/messages`,
     {
       headers: {
@@ -27,6 +31,7 @@ export function useChatMessages(
   stream: StreamState | null,
   stopStream?: (clear?: boolean) => void,
 ): { messages: Message[] | null; resumeable: boolean } {
+  const authFetch = useAuthFetch();
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [resumeable, setResumeable] = useState(false);
   const prevStreamStatus = usePrevious(stream?.status);
@@ -34,7 +39,7 @@ export function useChatMessages(
   useEffect(() => {
     async function fetchMessages() {
       if (threadId) {
-        const { messages, resumeable } = await getMessages(threadId);
+        const { messages, resumeable } = await getMessages(threadId, authFetch);
         setMessages(messages);
         setResumeable(resumeable);
       }
@@ -45,12 +50,12 @@ export function useChatMessages(
     return () => {
       setMessages(null);
     };
-  }, [threadId]);
+  }, [authFetch, threadId]);
 
   useEffect(() => {
     async function fetchMessages() {
       if (threadId) {
-        const { messages, resumeable } = await getMessages(threadId);
+        const { messages, resumeable } = await getMessages(threadId, authFetch);
         setMessages(messages);
         setResumeable(resumeable);
         stopStream?.(true);
@@ -63,7 +68,7 @@ export function useChatMessages(
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stream?.status]);
+  }, [authFetch, stream?.status]);
 
   return useMemo(
     () => ({
