@@ -1,3 +1,5 @@
+import base64
+import json
 from enum import Enum
 from functools import lru_cache
 from typing import Optional
@@ -287,7 +289,16 @@ def _get_tavily_answer():
 
 
 def _get_action_server(**kwargs: ActionServerConfig):
-    toolkit = ActionServerToolkit(url=kwargs["url"], api_key=kwargs["api_key"])
+    def _build_context(secrets: dict) -> str:
+        ctx = json.dumps({"secrets": secrets})
+        return base64.b64encode(ctx.encode("utf-8")).decode("ascii")
+
+    secrets = kwargs.get("secrets")
+    toolkit = ActionServerToolkit(
+        url=kwargs["url"],
+        api_key=kwargs["api_key"],
+        context=_build_context(secrets) if secrets else None,
+    )
     tools = toolkit.get_tools()
     return tools
 
